@@ -8,7 +8,7 @@
  * @License MIT License (http://opensource.org/Licenses/MIT)
  */
 
-//LUCA
+//LUCAfmkfdmgredk
 package bot;
 
 /**
@@ -30,7 +30,7 @@ import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
 public class BotStarter implements Bot 
-{
+{int k=0;
 	@Override
 	/**
 	 * A method that returns which region the bot would like to start on, the pickable regions are stored in the BotState.
