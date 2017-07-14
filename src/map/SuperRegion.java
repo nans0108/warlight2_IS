@@ -10,6 +10,7 @@
 
 package map;
 import java.util.LinkedList;
+import bot.BotState;
 
 public class SuperRegion {
 	
@@ -64,4 +65,49 @@ public class SuperRegion {
 	public LinkedList<Region> getSubRegions() {
 		return subRegions;
 	}
+	
+	/**
+	 * @return score of superRegion's region
+	 */
+	public double score(BotState state)
+	{
+        int numberOfArmies = 0;
+        boolean isWasteland = false;
+        double score = 0;
+
+        for(Region subRegion : subRegions) {
+        	Region region;
+        	if (state.getVisibleMap() == null) {
+        		 region = null;
+        	} else {
+                 region =  state.getVisibleMap().getRegion(subRegion.getId());
+        	}
+        	
+            if (region == null) {
+                for(Region wasteland : state.getWasteLands()) {
+                    if (wasteland.getId() == subRegion.getId()) {
+                        isWasteland = true;
+                        break;
+                    }
+                }
+                if (isWasteland) {
+                	numberOfArmies += 6;
+                } else {
+                	numberOfArmies += 2;
+                }
+            } else if (!subRegion.getPlayerName().equals(state.getMyPlayerName())) {
+            	numberOfArmies += subRegion.getArmies();
+            	
+            }
+        }
+        
+        if(numberOfArmies == 0){
+        	score = armiesReward;
+        } else {
+        	score = (double)armiesReward / numberOfArmies;
+        }
+ 
+        return score;
+    }
+	
 }

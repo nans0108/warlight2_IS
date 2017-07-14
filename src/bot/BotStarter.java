@@ -25,12 +25,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import map.Region;
-import map.SuperRegion;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
 public class BotStarter implements Bot 
-{int k=0;
+{
+
+//int k=0;
 	@Override
 	/**
 	 * A method that returns which region the bot would like to start on, the pickable regions are stored in the BotState.
@@ -39,12 +40,28 @@ public class BotStarter implements Bot
 	 */
 	public Region getStartingRegion(BotState state, Long timeOut)
 	{
-		double rand = Math.random();
-		int r = (int) (rand*state.getPickableStartingRegions().size());
-		int regionId = state.getPickableStartingRegions().get(r).getId();
-		Region startingRegion = state.getFullMap().getRegion(regionId);
+		Integer bestRegion = null;
+        double bestScore = 0;
+        double score = 0;
+
+		for(Region region : state.getPickableStartingRegions()) {
+            score = region.getSuperRegion().score(state);
+            if ((bestRegion == null || score > bestScore)){
+                bestScore = score;
+                bestRegion = region.getId();
+            }
+        }
+
+		Region startingRegion = state.getFullMap().getRegion(bestRegion);
 		
 		return startingRegion;
+		
+//		double rand = Math.random();
+//		int r = (int) (rand*state.getPickableStartingRegions().size());
+//		int regionId = state.getPickableStartingRegions().get(r).getId();
+//		Region startingRegion = state.getFullMap().getRegion(regionId);
+//		
+		//return startingRegion;
 	}
 
 	@Override
