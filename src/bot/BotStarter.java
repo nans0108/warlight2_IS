@@ -75,21 +75,56 @@ public class BotStarter implements Bot
 		
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
 		String myName = state.getMyPlayerName();
+		String opponentName = state.getOpponentPlayerName();
 		int armies = 2;
 		int armiesLeft = state.getStartingArmies();
 		LinkedList<Region> visibleRegions = state.getVisibleMap().getRegions();
 		
+		
+		
 		while(armiesLeft > 0)
 		{
-			double rand = Math.random();
-			int r = (int) (rand*visibleRegions.size());
-			Region region = visibleRegions.get(r);
 			
-			if(region.ownedByPlayer(myName))
-			{
-				placeArmiesMoves.add(new PlaceArmiesMove(myName, region, armies));
-				armiesLeft -= armies;
+			int numberOfArmies = 0;
+			int minNumberOfArmies = 0;
+			int maxNumberOfArmies = 0;
+
+			Region regionToPutArmies = null;
+			
+			//put armies on a region next to your opponent with the minimum number of armies
+			for( Region region : visibleRegions) {
+				if (region.ownedByPlayer(myName)) {
+					numberOfArmies = region.getArmies();
+					if(minNumberOfArmies == 0) {
+						minNumberOfArmies = numberOfArmies;
+					}
+					for(Region neighbor : region.getNeighbors()) {
+						if(neighbor.ownedByPlayer(opponentName) && numberOfArmies <= minNumberOfArmies) {
+							regionToPutArmies = region;
+							minNumberOfArmies = numberOfArmies;
+						} 
+						else if (regionToPutArmies == null) {
+							if(numberOfArmies >= maxNumberOfArmies) {
+								regionToPutArmies = region;
+								maxNumberOfArmies = numberOfArmies;
+							}
+						}	
+					}
+				}
 			}
+			
+			placeArmiesMoves.add(new PlaceArmiesMove(myName, regionToPutArmies, armies));
+			armiesLeft -= armies;
+			
+//			double rand = Math.random();
+//			int r = (int) (rand*visibleRegions.size());
+//			Region region = visibleRegions.get(r);
+//			
+//			if(region.ownedByPlayer(myName))
+//			{
+//				placeArmiesMoves.add(new PlaceArmiesMove(myName, region, armies));
+//				armiesLeft -= armies;
+//			}
 		}
 		
 		return placeArmiesMoves;
