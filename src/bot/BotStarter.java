@@ -76,8 +76,8 @@ public class BotStarter implements Bot
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
 		String myName = state.getMyPlayerName();
 		String opponentName = state.getOpponentPlayerName();
-		int armies = 2;
 		int armiesLeft = state.getStartingArmies();
+		int armies = armiesLeft;
 		LinkedList<Region> visibleRegions = state.getVisibleMap().getRegions();
 		
 		
@@ -86,32 +86,36 @@ public class BotStarter implements Bot
 		{
 			
 			int numberOfArmies = 0;
-			int minNumberOfArmies = 0;
+			//int minNumberOfArmies = 0;
 			int maxNumberOfArmies = 0;
+			double score = 0;
+			double bestScore = 0;
 
 			Region regionToPutArmies = null;
 			
 			//put armies on a region next to your opponent with the minimum number of armies
 			for( Region region : visibleRegions) {
 				if (region.ownedByPlayer(myName)) {
-					numberOfArmies = region.getArmies();
-					if(minNumberOfArmies == 0) {
-						minNumberOfArmies = numberOfArmies;
-					}
+					score = region.getSuperRegion().score(state);
 					for(Region neighbor : region.getNeighbors()) {
-						if(neighbor.ownedByPlayer(opponentName) && numberOfArmies <= minNumberOfArmies) {
-							regionToPutArmies = region;
-							minNumberOfArmies = numberOfArmies;
-						} 
-						else if (regionToPutArmies == null) {
-							if(numberOfArmies >= maxNumberOfArmies) {
-								regionToPutArmies = region;
-								maxNumberOfArmies = numberOfArmies;
-							}
-						}	
+						if(neighbor.ownedByPlayer(opponentName) && score > bestScore) {
+							bestScore = score;
+							regionToPutArmies = region;						} 
 					}
 				}
 			}
+			
+			if(regionToPutArmies == null) {
+				for( Region region : visibleRegions) {
+					if (region.ownedByPlayer(myName)){
+						numberOfArmies = region.getArmies();
+						if(numberOfArmies >= maxNumberOfArmies) {
+							regionToPutArmies = region;
+							maxNumberOfArmies = numberOfArmies;
+						}
+					}
+				}
+			}	
 			
 			placeArmiesMoves.add(new PlaceArmiesMove(myName, regionToPutArmies, armies));
 			armiesLeft -= armies;
