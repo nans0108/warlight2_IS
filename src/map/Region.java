@@ -12,6 +12,8 @@ package map;
 
 import java.util.LinkedList;
 
+import bot.BotState;
+
 
 public class Region {
 	
@@ -122,5 +124,19 @@ public class Region {
 	public String getPlayerName() {
 			return playerName;
 	}
-
+	
+	/**
+	 * @param state
+	 * @return True if for the region neighbors there is one of opponent, false otherwise
+	 */
+	public boolean nextToOpponent(BotState state)
+	{  
+		for(Region region : neighbors) {
+			if (state.getOpponentPlayerName().equals(region.getPlayerName())) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 }
